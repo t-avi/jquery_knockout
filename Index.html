@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
+    <title></title>
+</head>
+<body>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <p>JQuery</p>
+            <p id="time"></p> 
+        </div>
+        <div class="col-sm-6">
+            <p>Knockout</p>
+            <p data-bind="text: timekn"></p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6"><div class="alert alert-success" role="alert">
+            <p id="resultjq"></p></div></div>
+        <div class="col-sm-6"><div class="alert alert-success" role="alert">
+            <p data-bind="text: resultkn"></p></div></div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6"><button id="startjq" type="button" class="btn btn-primary">Запрос</button></div>
+        <div class="col-sm-6"><button data-bind="click: startkn" type="button" class="btn btn-primary">Запрос 2</button></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
+
+    <script>
+
+        setInterval(function () {
+            $('#time').html(getTime());
+        }, 1000);
+
+        // текущее время
+        function getTime() {
+            Data = new Date();
+            return Data.getHours() + ":" + Data.getMinutes() + ":" + Data.getSeconds();
+        };
+
+        //jquery
+
+        $('#startjq').click(function () {
+            $("#resultjq").text("Ожидание...");
+             var deferred = $.Deferred();
+            setTimeout(function() {
+                deferred.resolve(Math.floor(Math.random() * 100));
+            }, Math.floor(Math.random() * 2000))
+
+            var promise = deferred.promise();
+
+            promise.done(function (result) {
+                $("#resultjq").text(result);
+            });
+        });
+
+        //knockout
+        var ViewModel = function () {
+            this.timekn = ko.observable();
+            this.startkn = ko.observable();
+            this.resultkn = ko.observable();
+        };
+
+        var viewModel = new ViewModel();
+
+        setInterval(function () {
+            viewModel.timekn(getTime());
+        }, 1000);
+
+        viewModel.startkn = function () {
+            viewModel.resultkn("Ожидание...");
+            var deferred = $.Deferred();
+            setTimeout(function () {
+                deferred.resolve(Math.floor(Math.random() * 100));
+            }, Math.floor(Math.random() * 1000))
+
+            var promise = deferred.promise();
+            promise.done(function (result) {
+                viewModel.resultkn(result);
+            });
+        }
+        ko.applyBindings(viewModel);
+    </script>
+</body>
+</html>
